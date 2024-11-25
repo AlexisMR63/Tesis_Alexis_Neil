@@ -1,0 +1,309 @@
+A continuación, en esta sección se presentarán 10 artículos de investigación las cuales abordarán diversas técnicas y enfoques que se emplearon para afrontar problemas similares al de esta tesis. Es importante señalar que hasta la fecha
+ no se ha encontrado investigación alguna sobre este tema a nivel nacional. Asimismo, a continuación se presenta un cuadro resumen (véase Anexo \ref{A:table}) de lo que se presenta en esta sección.
+
+
+
+\subsection{A novel low-resource consumption and high-speed hardware implementation of HOG feature extraction on FPGA for human detection }
+
+
+\subsubsection{Planteamiento del Problema y objetivo }
+El artículo se enfoca en la creciente necesidad de mejorar la detección de peatones en entornos de tráfico complejos, dada la importancia de garantizar la seguridad de los transeúntes y la fluidez del tráfico. La implementación de algoritmos de detección de peatones en vehículos inteligentes tiene un impacto significativo en la reducción de accidentes y la optimización del flujo vehicular. Sin embargo, el desarrollo de estos sistemas presenta desafíos considerables, especialmente cuando se requieren soluciones que sean tanto eficientes en términos de precisión como de consumo de recursos computacionales. Los métodos tradicionales basados en redes neuronales convolucionales (CNN) han demostrado ser eficaces, pero su adopción en dispositivos con recursos limitados, como los sistemas embebidos en vehículos, se ve restringida debido a sus elevadas demandas computacionales. Por ello, el objetivo del estudio es diseñar una implementación optimizada del algoritmo Histogramas de Gradientes Orientados (HOG) en hardware utilizando FPGA (Field Programmable Gate Array), con el fin de reducir el uso de recursos y aumentar la velocidad de procesamiento, sacrificando mínimamente la precisión del sistema.
+
+\subsubsection{Técnicas empleadas por los autores}
+Los autores han propuesto varias técnicas para optimizar la implementación del algoritmo HOG en hardware. Una de las técnicas principales consiste en la simplificación del cálculo de la magnitud y orientación de los gradientes, reduciendo la cantidad de operaciones computacionales requeridas. Tradicionalmente, la asignación de bins en el algoritmo HOG se realiza mediante funciones trigonométricas como la arcotangente, lo que incrementa el costo computacional. En este estudio, los autores han desarrollado un método alternativo basado en comparaciones que evita el uso de funciones trigonométricas. En lugar de calcular el ángulo exacto del vector de gradiente, el rango de 0 a 180 grados se divide en 8 bins de 22.5 grados cada uno, permitiendo una asignación rápida a través de comparaciones sucesivas de las magnitudes y signos de los gradientes en las direcciones x y. Para el cálculo de la magnitud del gradiente, en lugar de utilizar la fórmula exacta que implica operaciones de raíz cuadrada, se implementa una aproximación que utiliza comparaciones y multiplicaciones predefinidas, lo que reduce significativamente la utilización de unidades de procesamiento de señales digitales (DSP). Asimismo, para la normalización de bloques, se opta por la aproximación de Newton-Raphson para el cálculo de la inversa de la raíz cuadrada, lo cual reduce el uso de hardware especializado y acelera el proceso.
+
+\subsubsection{Metodología empleada por los autores}
+La implementación del sistema se llevó a cabo utilizando un FPGA Xilinx Artix-7, seleccionado por su capacidad para soportar operaciones en paralelo, un aspecto crítico para mejorar la eficiencia del algoritmo HOG en tiempo real. El flujo de trabajo inicia con la conversión de la imagen de entrada al formato de escala de grises, lo que simplifica el proceso de cálculo de gradientes. A continuación, se utiliza el operador Sobel para determinar los gradientes en las direcciones 
+ x y, lo que permite detectar cambios significativos en la intensidad de la imagen. La técnica de asignación de bins se implementa mediante una jerarquía de comparaciones: primero se evalúa el signo del gradiente en la dirección x, seguido de la comparación de las magnitudes relativas de los componentes x y, y finalmente se aplica un umbral para determinar el bin exacto. Esta técnica minimiza el uso de recursos, ya que requiere solo tres comparaciones y una multiplicación. Para la etapa de normalización, el enfoque basado en Newton-Raphson permite aproximar la raíz cuadrada inversa de manera eficiente, empleando un valor inicial calculado que reduce el número de iteraciones necesarias. Los histogramas de gradientes se construyen para cada celda y luego se normalizan por bloques, lo que garantiza que los descriptores de características sean robustos frente a cambios en la iluminación de la imagen.
+%%%Ecuacion
+%\begin{equation}  
+%\label{eq:RMSE}
+%RMSE = \sqrt{\frac{\sum_{i=1}^{N}{\Big(O_i -T_i\Big)^2}}{N}}
+%\end{equation}
+
+
+\subsubsection{Resultados obtenidos}
+El diseño propuesto demostró una mejora sustancial en términos de consumo de recursos y velocidad de procesamiento comparado con las implementaciones tradicionales del algoritmo HOG en hardware. En particular, el sistema utilizó 4117 tablas de búsqueda (LUTs) y 4.5 Kbits de memoria RAM de bloque, lo que representa una reducción significativa respecto a otras implementaciones, algunas de las cuales superan los 10,000 LUTs y utilizan más de 300 Kbits de memoria. En cuanto a la velocidad de procesamiento, se alcanzó un rendimiento de 0.933 píxeles por ciclo de reloj, lo que supone una mejora considerable en comparación con otros métodos, que generalmente se encuentran en el rango de 0.4 a 0.7 píxeles por ciclo. En términos de precisión, el sistema mostró una reducción mínima, con una disminución del 1.2\% en la exactitud para el conjunto de datos INRIA y del 0.11\% para el conjunto de datos MIT. Aunque la precisión se vio ligeramente afectada, esta pérdida es aceptable en aplicaciones donde la eficiencia y el consumo de recursos son críticos. Las simulaciones realizadas en MATLAB mostraron una diferencia de precisión menor al 0.5\% respecto a la implementación en hardware, lo que subraya la fiabilidad del enfoque propuesto.
+
+
+\subsection{Robust Human Detection Using Histogram
+Oriented Gradient and Aggregate Channel}
+
+\subsubsection{Planteamiento del Problema y objetivo }
+El artículo aborda la creciente demanda en los sistemas de detección de objetos, particularmente en aplicaciones con vehículos autónomos y drones, en los cuales resulta fundamental una detección eficaz y precisa para la correcta operación de estas plataformas en tiempo real. Los sistemas de vigilancia, control de tráfico y los dispositivos autónomos requieren identificar y rastrear objetos con alta precisión, incluso bajo condiciones difíciles, como variaciones de iluminación o presencia de obstáculos. Sin embargo, los métodos tradicionales de redes neuronales profundas, aunque precisos, requieren de gran capacidad de procesamiento y un extenso conjunto de datos para su entrenamiento, lo que limita su aplicación en hardware con recursos limitados. Ante este desafío, el estudio tiene como objetivo desarrollar un sistema de detección de humanos que sea preciso y eficiente, basado en características de gradiente orientado (HOG) y características de canal agregado (ACF), complementado con una arquitectura de red neuronal convolucional (CNN) como GoogleNet. Esta integración tiene como propósito mejorar la precisión en la detección y reducir el consumo de recursos, haciéndolo ideal para plataformas de hardware limitado como vehículos autónomos y sistemas de búsqueda y rescate en ambientes adversos.
+
+
+
+\subsubsection{Técnicas empleadas por los autores}
+Para optimizar la eficiencia en la detección de humanos, los autores emplean una combinación de técnicas avanzadas. Se utiliza GoogleNet como un sistema de atención que filtra las imágenes que contienen objetivos humanos, optimizando así el uso de la CPU al evitar procesar imágenes irrelevantes. Esto se complementa con el uso de las características HOG y ACF. GoogleNet identifica eficazmente las imágenes de interés y las clasifica con una precisión del 99.69\%, minimizando la pérdida de información a un 0.05\%. Una vez identificadas las imágenes con presencia humana, el sistema utiliza ACF con un clasificador AdaBoost para optimizar la detección y clasificación de objetos en múltiples escalas, lo cual es adecuado para entornos de movimiento rápido. Además, el sistema fusiona estas características de gradiente y canal, reduciendo los errores de detección y mejorando la robustez frente a variaciones de fondo y condiciones de iluminación. Esta combinación de técnicas garantiza una alta precisión en las detecciones y reduce el tiempo de procesamiento de cada cuadro.
+
+\subsubsection{Metodología empleada por los autores}
+El sistema propuesto utiliza una metodología que combina diversas etapas de procesamiento en secuencia, apoyándose en múltiples modelos de CNN y técnicas de procesamiento de imágenes. Primero, se compararon varios modelos de CNN (ResNet18, ResNet50, SqueezeNet, Darknet53 y GoogleNet) en términos de precisión y pérdida, utilizando datos de los conjuntos UAV123, UAV123@10fps, COCO y OpenImagesV6. GoogleNet mostró el mejor rendimiento, con una precisión del 99.69\% y mínima pérdida, por lo cual fue seleccionado para la clasificación preliminar de imágenes con contenido humano. Una vez filtradas las imágenes relevantes, se aplican las características ACF y HOG mediante AdaBoost, lo que permite determinar las posiciones exactas de los objetivos en las imágenes detectadas. Para el entrenamiento del sistema, se empleó un total de 3252 imágenes, utilizando un 70\% para entrenamiento y un 30\% para validación, con un procesador Intel Core i5 y 8 GB de RAM. La configuración de los parámetros para los entrenamientos de CNN incluyó un tamaño de minibatch de 100, una tasa de aprendizaje inicial de 0.001 y un máximo de 10 épocas, buscando optimizar la precisión del sistema sin comprometer la eficiencia.
+%%%Ecuacion
+%\begin{equation}  
+%\label{eq:RMSE}
+%RMSE = \sqrt{\frac{\sum_{i=1}^{N}{\Big(O_i -T_i\Big)^2}}{N}}
+%\end{equation}
+
+
+\subsubsection{Resultados obtenidos}
+Los resultados obtenidos en el estudio demuestran una mejora significativa en la precisión y eficiencia del sistema. Al combinar GoogleNet con ACF y HOG, el sistema alcanzó una precisión de 97.4\%, notablemente superior al 92.1\% logrado con GoogleNet y ACF sin HOG, y al 89\% utilizando únicamente ACF. La inclusión de HOG como complemento mejora considerablemente la detección de objetivos humanos en entornos con ruido o iluminación cambiante. En términos de velocidad de procesamiento, la propuesta reduce significativamente la carga en la CPU, alcanzando hasta un 75\% de ahorro al desactivar el procesamiento de imágenes irrelevantes. La velocidad de procesamiento en imágenes con presencia humana es de 5 cuadros por segundo (FPS), mientras que al desactivar las características de detección en imágenes sin humanos, la velocidad alcanza los 20 FPS. Estos resultados confirman la eficacia del sistema propuesto, que equilibra precisión y eficiencia, haciéndolo adecuado para aplicaciones en vehículos no tripulados y en sistemas de búsqueda y rescate en condiciones adversas.
+
+\subsection{When AI meets store layout design: a review}
+Nguyen, Le, Martin, Cil y Fookes publicaron un artículo en la revista Artificial Intelligence Review en el año 2022, titulado “When AI meets store layout design: a review”, que en español se traduce como “Cuando la inteligencia artificial se encuentra con el diseño de distribución en tiendas: una revisión”.
+
+\subsubsection{Planteamiento del Problema y objetivo }
+El artículo examina cómo la inteligencia artificial (IA) puede transformar el diseño de distribución de tiendas, optimizando la presentación de mercancías para captar la atención del cliente y mejorar la rentabilidad. Este tema es crucial, ya que un diseño eficiente de la tienda fomenta que los clientes exploren más pasillos y se expongan a una mayor cantidad de productos, lo cual se asocia directamente con el incremento en las ventas. Tradicionalmente, el diseño de las tiendas responde de manera pasiva al comportamiento del cliente, basándose en la observación de ventas y en cambios de exhibición para incrementar la demanda. Sin embargo, este enfoque tradicional no captura la navegación real de los clientes ni sus tiempos de estancia en cada sección. A través de la aplicación de la IA en la infraestructura de videovigilancia (CCTV) existente, este estudio busca proporcionar una nueva perspectiva que permita entender y predecir el comportamiento del cliente dentro de las tiendas. El objetivo del estudio es, entonces, realizar una revisión exhaustiva de los enfoques tradicionales y modernos, proponiendo un marco impulsado por IA que transforme datos de CCTV en inteligencia empresarial para mejorar el diseño de las tiendas.
+
+
+
+
+\subsubsection{Técnicas empleadas por los autores}
+Los autores emplean diversas técnicas de análisis de video e inteligencia artificial, destacando el uso de técnicas de visión computacional y aprendizaje profundo para captar y analizar el comportamiento del cliente. Utilizan métodos de reconocimiento de patrones y detección de objetos, incluidos algoritmos de detección de rostros y reconocimiento emocional, que permiten identificar la disposición emocional de los clientes frente a los productos exhibidos. Estas técnicas de IA se aplican sobre los datos capturados por CCTV, permitiendo así un análisis detallado del flujo de clientes, la identificación de los productos que captan mayor atención y la detección de zonas con baja interacción. Además, los autores incorporan técnicas de analítica avanzada, como mapas de calor, que visualizan las áreas de mayor tráfico y el tiempo que los clientes dedican a diferentes secciones de la tienda. Estas técnicas proporcionan una comprensión profunda y cuantitativa del comportamiento del cliente, ofreciendo bases para rediseñar la distribución de los espacios de manera informada.
+
+
+\subsubsection{Metodología empleada por los autores}
+La metodología del estudio se estructura en un marco denominado “Sense-Think-Act-Learn” (STAL), que divide el proceso en cuatro etapas: 1) Captura de datos mediante la recopilación de videos de CCTV y otros datos de mercado, 2) Procesamiento de datos utilizando técnicas de analítica de video para limpiar, transformar y de-identificar la información respetando la privacidad de los clientes, 3) Análisis inteligente de video mediante el cual algoritmos de IA analizan patrones de comportamiento y preferencias de los clientes en tiempo real, y 4) Toma de decisiones donde los resultados de la analítica se implementan para optimizar el diseño de la tienda y mejorar la satisfacción del cliente. Este marco metodológico permite una evaluación continua, que facilita la reestructuración de los espacios de la tienda según los patrones de tráfico y las preferencias observadas. El sistema es escalable, al utilizar un sistema en la nube que permite almacenar y analizar grandes volúmenes de datos sin los costos de mantenimiento asociados a sistemas locales.
+
+%%%Ecuacion
+%\begin{equation}  
+%\label{eq:RMSE}
+%RMSE = \sqrt{\frac{\sum_{i=1}^{N}{\Big(O_i -T_i\Big)^2}}{N}}
+%\end{equation}
+
+
+\subsubsection{Resultados obtenidos}
+Los resultados obtenidos con la implementación del marco propuesto reflejan una mejora significativa en la optimización de la distribución de tiendas y en la satisfacción del cliente. El análisis de datos de video, en conjunto con mapas de calor y técnicas de reconocimiento de emociones, permite identificar patrones de navegación y zonas de alta interacción. Esto ha demostrado ser efectivo para ubicar productos estratégicamente y reorganizar el espacio de manera que maximice la exposición de mercancías populares y optimice la experiencia de compra. El estudio muestra que la implementación de un sistema basado en IA permite aumentar la eficiencia en la gestión de inventarios y en la planificación de la tienda, mejorando las métricas de rendimiento como el tiempo de estancia de los clientes en la tienda y el flujo de tráfico. Este enfoque integral orientado a la satisfacción del cliente y la eficiencia operacional presenta una base sólida para futuras investigaciones y aplicaciones en la optimización de tiendas mediante IA.
+
+
+\subsection{Utilizing Gen AI and Computer Vision for Applications in the Retail}
+Nguyen, Le, Martin, Cil y Fookes publicaron un artículo en la revista Artificial Intelligence Review en el año 2022, titulado “When AI meets store layout design: a review”, que en español se traduce como “Cuando la inteligencia artificial se encuentra con el diseño de distribución en tiendas: una revisión”.
+
+\subsubsection{Planteamiento del Problema y objetivo }
+El artículo examina cómo la inteligencia artificial (IA) puede transformar el diseño de distribución de tiendas, optimizando la presentación de mercancías para captar la atención del cliente y mejorar la rentabilidad. Este tema es crucial, ya que un diseño eficiente de la tienda fomenta que los clientes exploren más pasillos y se expongan a una mayor cantidad de productos, lo cual se asocia directamente con el incremento en las ventas. Tradicionalmente, el diseño de las tiendas responde de manera pasiva al comportamiento del cliente, basándose en la observación de ventas y en cambios de exhibición para incrementar la demanda. Sin embargo, este enfoque tradicional no captura la navegación real de los clientes ni sus tiempos de estancia en cada sección. A través de la aplicación de la IA en la infraestructura de videovigilancia (CCTV) existente, este estudio busca proporcionar una nueva perspectiva que permita entender y predecir el comportamiento del cliente dentro de las tiendas. El objetivo del estudio es, entonces, realizar una revisión exhaustiva de los enfoques tradicionales y modernos, proponiendo un marco impulsado por IA que transforme datos de CCTV en inteligencia empresarial para mejorar el diseño de las tiendas.
+
+
+
+
+\subsubsection{Técnicas empleadas por los autores}
+Los autores emplean diversas técnicas de análisis de video e inteligencia artificial, destacando el uso de técnicas de visión computacional y aprendizaje profundo para captar y analizar el comportamiento del cliente. Utilizan métodos de reconocimiento de patrones y detección de objetos, incluidos algoritmos de detección de rostros y reconocimiento emocional, que permiten identificar la disposición emocional de los clientes frente a los productos exhibidos. Estas técnicas de IA se aplican sobre los datos capturados por CCTV, permitiendo así un análisis detallado del flujo de clientes, la identificación de los productos que captan mayor atención y la detección de zonas con baja interacción. Además, los autores incorporan técnicas de analítica avanzada, como mapas de calor, que visualizan las áreas de mayor tráfico y el tiempo que los clientes dedican a diferentes secciones de la tienda. Estas técnicas proporcionan una comprensión profunda y cuantitativa del comportamiento del cliente, ofreciendo bases para rediseñar la distribución de los espacios de manera informada.
+
+
+\subsubsection{Metodología empleada por los autores}
+La metodología del estudio se estructura en un marco denominado “Sense-Think-Act-Learn” (STAL), que divide el proceso en cuatro etapas: 1) Captura de datos mediante la recopilación de videos de CCTV y otros datos de mercado, 2) Procesamiento de datos utilizando técnicas de analítica de video para limpiar, transformar y de-identificar la información respetando la privacidad de los clientes, 3) Análisis inteligente de video mediante el cual algoritmos de IA analizan patrones de comportamiento y preferencias de los clientes en tiempo real, y 4) Toma de decisiones donde los resultados de la analítica se implementan para optimizar el diseño de la tienda y mejorar la satisfacción del cliente. Este marco metodológico permite una evaluación continua, que facilita la reestructuración de los espacios de la tienda según los patrones de tráfico y las preferencias observadas. El sistema es escalable, al utilizar un sistema en la nube que permite almacenar y analizar grandes volúmenes de datos sin los costos de mantenimiento asociados a sistemas locales.
+
+%%%Ecuacion
+%\begin{equation}  
+%\label{eq:RMSE}
+%RMSE = \sqrt{\frac{\sum_{i=1}^{N}{\Big(O_i -T_i\Big)^2}}{N}}
+%\end{equation}
+
+
+\subsubsection{Resultados obtenidos}
+Los resultados obtenidos con la implementación del marco propuesto reflejan una mejora significativa en la optimización de la distribución de tiendas y en la satisfacción del cliente. El análisis de datos de video, en conjunto con mapas de calor y técnicas de reconocimiento de emociones, permite identificar patrones de navegación y zonas de alta interacción. Esto ha demostrado ser efectivo para ubicar productos estratégicamente y reorganizar el espacio de manera que maximice la exposición de mercancías populares y optimice la experiencia de compra. El estudio muestra que la implementación de un sistema basado en IA permite aumentar la eficiencia en la gestión de inventarios y en la planificación de la tienda, mejorando las métricas de rendimiento como el tiempo de estancia de los clientes en la tienda y el flujo de tráfico. Este enfoque integral orientado a la satisfacción del cliente y la eficiencia operacional presenta una base sólida para futuras investigaciones y aplicaciones en la optimización de tiendas mediante IA.
+
+\subsection{Análisis del comportamiento de clientes mediante detección de personas}
+
+Este artículo presenta un framework para analizar el comportamiento de clientes en tiendas minoristas mediante la detección de personas en videos de vigilancia. Se desarrolla un pipeline que aplica el modelo SiamMOT para el seguimiento de personas, complementado por un proceso de pre y postprocesamiento. Los resultados brindan información útil para el negocio, como indicadores y mapas de calor de las zonas ocupadas, y se valida mediante comparación manual para evaluar la precisión del algoritmo.
+
+
+
+\subsubsection{Planteamiento del Problema y objetivo }
+El artículo se enfoca en resolver la dificultad que enfrentan los algoritmos tradicionales de detección de personas al ser implementados en entornos comerciales reales, donde las condiciones de operación son complejas debido a la presencia de obstáculos físicos (mesas, góndolas, carteles) y oclusiones entre clientes, además de variaciones de luz y ruido en la imagen . Según estudios recientes, más del 70\% de las personas en videos tomados en tiendas y bancos aparecen parcialmente ocluidas, lo que reduce la eficacia de los métodos convencionales de detección. Ante esta situación, los sistemas de seguimiento basados en aprendizaje profundo, como las redes neuronales convolucionales (CNN), han demostrado una mayor eficacia, pero requieren alto poder computacional, lo que limita su implementación en hardware accesible para pequeños comercios.
+
+Por lo tanto, este trabajo propone el desarrollo de un framework eficiente para detectar y seguir personas en tiempo real, optimizado para funcionar en sistemas con recursos limitados, como computadoras de uso doméstico. El objetivo principal es proveer herramientas de análisis, como mapas de calor y conteos de aforo en cada momento, que puedan ser utilizados por los negocios para mejorar la gestión de espacios y comprender el comportamiento de la clientela.
+
+
+
+\subsubsection{Técnicas empleadas por los autores}
+El enfoque propuesto utiliza el modelo SiamMOT (Siamese Multi-Object Tracking), una arquitectura siamesa que combina dos ramas idénticas con pesos compartidos. Una rama procesa la imagen actual del video y la otra una imagen de referencia, lo que permite el seguimiento preciso de personas a lo largo del tiempo mediante la comparación de características extraídas por redes completamente convolucionales (FCN).
+
+Durante el procesamiento, el sistema filtra las detecciones incorrectas mediante un modelo basado en la altura y posición relativa de las personas detectadas, evitando falsos positivos. La distancia de cada persona a la cámara se estima mediante el campo de visión (FOV), lo que permite calcular su altura en píxeles y filtrar detecciones inconsistentes. Además, se aplica una etapa de recuperación que utiliza la trayectoria del movimiento de los clientes para identificar personas temporalmente ocultas por oclusiones. Esta recuperación se realiza interpolando la posición de la persona mediante la predicción basada en el algoritmo de Kalman.
+
+Para la validación del sistema, los autores emplearon herramientas de etiquetado manual como CVAT y métricas estándar del área, tales como IDF1 para medir la precisión en la identificación de objetos y HOTA para evaluar la exactitud del seguimiento a través del tiempo. Estas métricas fueron comparadas con la "ground truth" (verdad absoluta) obtenida del etiquetado manual para medir la concordancia entre las predicciones del modelo y los datos reales.
+
+
+\subsubsection{Metodología empleada por los autores}
+El sistema se diseñó como un pipeline de procesamiento en etapas secuenciales. La primera fase incluye la adquisición del video en formato MP4 a 24 FPS desde cámaras de vigilancia. A continuación, se realiza un preprocesamiento utilizando la librería OpenCV, donde se recorta y redimensiona la imagen para mejorar la precisión del modelo SiamMOT. Se evaluaron varias configuraciones, como la reducción de la tasa de FPS y la división de las imágenes en cuadrantes, con el objetivo de optimizar el procesamiento sin sacrificar precisión.
+
+El modelo SiamMOT fue seleccionado por su eficacia en el seguimiento de personas en entornos interiores. A pesar de ser más lento que otros modelos como YOLOv7, el rendimiento del SiamMOT resultó superior en términos de precisión y recall. En la fase de postprocesamiento, se filtran detecciones incorrectas basadas en criterios de altura y posición, y se implementa un proceso de recuperación de personas que desaparecen momentáneamente del campo visual.
+
+Finalmente, la solución fue validada con métricas como SFDA (Spatial-Temporal Detection Accuracy) para medir la superposición entre las detecciones y la ground truth. Para las pruebas, se procesaron videos tomados en una librería, comparando los resultados obtenidos con las anotaciones manuales realizadas con CVAT.
+%%%Ecuacion
+%\begin{equation}  
+%\label{eq:RMSE}
+%RMSE = \sqrt{\frac{\sum_{i=1}^{N}{\Big(O_i -T_i\Big)^2}}{N}}
+%\end{equation}
+
+
+\subsubsection{Resultados obtenidos}
+Los resultados muestran que el sistema propuesto alcanzó un recall del 79.28\% y una precisión del 96.6\% con la configuración de 12 FPS, superando otras configuraciones de FPS más altas o bajas, lo que confirma la optimización del recurso computacional sin pérdida significativa de precisión. El modelo SiamMOT, tras el postprocesamiento, logró un incremento en IDF1 del 6.4\% y un aumento del recall del 8.2\%, lo que resalta la importancia de las técnicas de refinamiento aplicadas.
+
+El uso de mapas de calor generados a partir de las detecciones permitió identificar con precisión las zonas más transitadas en la tienda, brindando información relevante para la gestión del espacio. Además, el modelo logró una eficiencia del 94.09\% al comparar el bounding box de las zonas más concurridas contra la ground truth mediante la métrica IoU (Intersección sobre la Unión), lo que valida la precisión de las detecciones.
+
+En términos de rendimiento, el sistema fue evaluado en un equipo con 16 GB de RAM y un procesador de 8 núcleos a 3.6 GHz, donde el algoritmo SiamMOT procesó videos de 30 minutos en un tiempo total de 28,448 segundos, destacando su estabilidad en ambientes con recursos moderados. Los resultados sugieren que el sistema es aplicable en entornos reales, ofreciendo un balance adecuado entre precisión, recall y eficiencia, lo que lo hace útil para el análisis del comportamiento de clientes en establecimientos comerciales.
+
+\subsection{Detección de Personas a Larga Distancia Basada en YOLOv7}
+
+Este artículo aborda los desafíos de la detección de personas en imágenes de baja resolución mediante la implementación de un modelo mejorado, llamado TOD-YOLOv7, basado en la arquitectura YOLOv7. El objetivo del estudio es optimizar la detección de objetos pequeños, como personas vistas a larga distancia, en contextos donde la oclusión y las variaciones de postura dificultan la precisión. El trabajo destaca la importancia de resolver estos problemas en aplicaciones críticas, como operaciones de rescate y vehículos autónomos, proponiendo un modelo que incorpora técnicas avanzadas de convolución, atención coordinada y ampliación de capas de detección.
+
+
+
+\subsubsection{Planteamiento del Problema y objetivo }
+La detección de personas a larga distancia presenta desafíos considerables debido a la baja resolución de las imágenes y la frecuente oclusión de los objetos. Estas dificultades se agravan en escenarios complejos como playas o zonas marítimas, donde las proporciones de las personas son pequeñas y el fondo es vasto y detallado. La detección precisa es esencial en aplicaciones como el rescate en alta mar o el monitoreo con drones, donde los modelos tradicionales de detección de objetos muestran limitaciones significativas. Los datasets existentes, como CityPersons e INRIA, contienen imágenes de alta resolución en entornos urbanos, lo que limita su aplicabilidad para detectar personas en imágenes de baja calidad. En este contexto, el objetivo del estudio es mejorar la arquitectura YOLOv7 mediante la adición de un módulo especializado en la detección de objetos pequeños, optimizando la capacidad del modelo para distinguir personas en situaciones adversas y minimizar las falsas detecciones. La investigación se centra en lograr una mayor precisión sin sacrificar la velocidad, permitiendo su uso en tiempo real en sistemas críticos.
+
+
+
+
+
+
+\subsubsection{Técnicas empleadas por los autores}
+El modelo TOD-YOLOv7 incorpora múltiples mejoras sobre la arquitectura estándar de YOLOv7 para abordar los retos específicos de la detección de personas a larga distancia. En primer lugar, los autores añadieron un módulo de convolución recursiva (gnConv) que facilita la interacción espacial de alto orden, permitiendo al modelo aprender características complejas sin añadir sobrecarga computacional significativa. Además, se integró un módulo de atención coordinada (CA) para centrar el procesamiento del modelo en áreas relevantes, filtrando información irrelevante del fondo. También se añadió una cabeza de detección adicional en la estructura del cuello del modelo, lo que permite realizar detecciones en múltiples escalas. Este enfoque mejora la capacidad del modelo para identificar tanto personas grandes como pequeñas en diferentes condiciones. Finalmente, el modelo utiliza técnicas avanzadas de aumento de datos, como MixUp y Mosaic, para mejorar la capacidad de generalización del modelo y prevenir el sobreajuste. Estas técnicas combinan varias imágenes en una sola para simular condiciones más diversas durante el entrenamiento, aumentando la robustez del modelo frente a variaciones en el entorno.
+
+
+
+
+
+\subsubsection{Metodología empleada por los autores}
+El modelo fue entrenado desde cero utilizando exclusivamente el TinyPerson dataset, un conjunto de datos diseñado para la detección de personas en situaciones de alta complejidad, donde las personas ocupan menos de 20 píxeles en la imagen. Los datos se dividieron en un conjunto de entrenamiento y uno de validación en una proporción cercana a 1:1, lo que permitió una evaluación más precisa del rendimiento del modelo. Durante el entrenamiento, se ajustó una tasa de aprendizaje inicial de 0.01 y se empleó el algoritmo Adam como función de optimización, lo que facilitó la adaptación del modelo a las pequeñas variaciones en los datos. El entrenamiento se llevó a cabo durante 1000 épocas con un tamaño de batch de 32, utilizando una GPU NVIDIA RTX 3090 para garantizar la estabilidad y eficiencia del proceso. Para evitar la pérdida de información crítica, se realizaron ajustes en tiempo real mediante una evaluación continua de las métricas de precisión y recall. El modelo se sometió además a experimentos de ablación para evaluar el impacto de cada componente añadido, demostrando cómo cada mejora contribuye al rendimiento general.
+
+%%%Ecuacion
+%\begin{equation}  
+%\label{eq:RMSE}
+%RMSE = \sqrt{\frac{\sum_{i=1}^{N}{\Big(O_i -T_i\Big)^2}}{N}}
+%\end{equation}
+
+\subsubsection{Resultados obtenidos}
+El modelo TOD-YOLOv7 mostró mejoras significativas respecto a la versión original de YOLOv7 en términos de precisión y eficiencia. La incorporación del módulo gnConv redujo los parámetros del modelo en 1.1 millones sin afectar negativamente el rendimiento, mientras que el módulo de atención coordinada incrementó el valor AP en un 0.6\% al mejorar la localización de objetos relevantes. La adición de una cabeza de detección extra permitió al modelo alcanzar un AP50 de 30\%, superando en 2.6 puntos porcentuales al modelo base. En términos de velocidad, el modelo procesó imágenes a una tasa de 208 FPS, lo que confirma su aplicabilidad en sistemas de tiempo real. Comparado con otros detectores de objetos, como Faster R-CNN y YOLOv5, el TOD-YOLOv7 demostró un rendimiento superior en la detección de personas en situaciones de baja resolución, alcanzando un AP general de 9.5\%. Estos resultados validan la eficacia del modelo en la detección de personas a larga distancia, haciéndolo especialmente útil para aplicaciones en drones, operaciones de rescate y monitoreo en áreas extensas con objetos pequeños.
+
+
+\subsection{Sistema Mejorado de Autopago Basado en YOLOv10}
+
+Este artículo presenta un sistema avanzado de autopago en el comercio minorista basado en una versión mejorada de la arquitectura YOLOv10, denominada MidState-YOLO-ED. Con esta tecnología, se busca transformar la automatización en los entornos de autopago, incrementando significativamente la precisión y eficiencia en la identificación de productos, especialmente en escenarios de alta complejidad visual. El sistema propuesto permite abordar problemáticas comunes en estos entornos, como el solapamiento de productos, las variaciones de iluminación y la presencia de fondos complejos, proporcionando una solución de detección rápida y precisa que se adapta a las necesidades del comercio minorista moderno.
+
+
+\subsubsection{Planteamiento del Problema y objetivo }
+Los sistemas de autopago se han convertido en componentes esenciales en el comercio minorista debido a la creciente demanda de los consumidores por servicios rápidos y eficientes. No obstante, la tecnología actual enfrenta desafíos importantes que limitan su efectividad. Entre los problemas críticos se encuentra la dificultad para reconocer de manera precisa y rápida una amplia variedad de productos en entornos con características complejas, como iluminación variable, productos parcialmente ocluidos y fondos visualmente detallados. Estas dificultades tienden a generar errores en la identificación de productos y afectan la experiencia del cliente, además de disminuir la eficiencia operativa. Los sistemas tradicionales suelen presentar limitaciones en cuanto a la precisión, especialmente al identificar productos similares entre sí o dispuestos de manera irregular. El objetivo de este estudio es desarrollar un sistema de detección de objetos en tiempo real que incremente las tasas de precisión y velocidad sin comprometer la capacidad de reconocimiento en entornos minoristas complejos. Para alcanzar este objetivo, los autores han implementado mejoras significativas en la estructura de YOLOv10, integrando innovaciones técnicas que optimizan la detección de productos. Asimismo, han trabajado en mantener una arquitectura ligera y eficiente que permite su implementación en dispositivos con recursos computacionales limitados, como dispositivos móviles y sistemas embebidos, lo cual es crucial para su aplicabilidad en tiendas y establecimientos de alta concurrencia.
+
+
+\subsubsection{Técnicas empleadas por los autores}
+El sistema MidState-YOLO-ED desarrollado en este estudio se basa en una serie de mejoras estratégicas sobre YOLOv10, combinadas con elementos de YOLOv8 para enfrentar las dificultades específicas de los entornos minoristas. Una de las técnicas clave empleadas es el mecanismo de atención multi-escala (EMA), que permite al sistema captar y procesar información contextual de manera que facilita la diferenciación entre productos visualmente similares. EMA adopta una estructura paralela que mejora tanto el rendimiento del procesamiento como la precisión en la detección, capturando relaciones de dependencia a corto y largo plazo entre píxeles. Esta técnica es particularmente útil en escenarios donde los productos pueden estar parcialmente ocultos o distribuidos en patrones complejos en la superficie de pago, problemas que los sistemas tradicionales no abordan de manera efectiva.
+
+Otra técnica fundamental en este sistema es el diseño de convolución dual ligero, también conocido como C2f-Dual, que integra mapas de características de bajo y alto nivel. Este diseño permite optimizar el flujo de gradiente en el modelo, reduciendo significativamente la redundancia en los mapas de características profundas. La reducción de redundancia en estos mapas no solo optimiza el uso de recursos computacionales, sino que también ayuda a minimizar las tasas de falsos positivos y negativos, mejorando la precisión del sistema. El diseño C2f-Dual emplea tanto convoluciones de 3x3, que captan información espacial detallada, como de 1x1, que integran y comprimen la información de manera eficiente. Asimismo, los autores han integrado módulos de YOLOv8 y YOLOv10 para maximizar la capacidad del sistema. La combinación de componentes de ambas versiones permite aprovechar sus fortalezas y superar ciertas limitaciones de YOLOv10 en cuanto a precisión. El sistema resultante mantiene una elevada precisión sin sacrificar la velocidad, adaptándose mejor a las demandas de los entornos minoristas actuales.
+
+Finalmente, los algoritmos de aumento de datos utilizados, como MixUp y Mosaic, son esenciales para mejorar la capacidad del modelo en la generalización a distintos escenarios. Estas técnicas permiten combinar múltiples imágenes en una sola, simulando condiciones variables y desafiantes durante el entrenamiento del modelo. Esto refuerza la robustez del sistema frente a distintos patrones de disposición de productos en el entorno minorista, logrando un desempeño adecuado en diversas configuraciones.
+
+
+\subsubsection{Metodología empleada por los autores}
+Para entrenar el modelo, se utilizó una porción del conjunto de datos RPC (Retail Product Checkout), uno de los conjuntos de datos más grandes y detallados para la identificación de productos en el comercio minorista. De las 83,000 imágenes disponibles, los autores seleccionaron 30,000 que simulan configuraciones realistas de pago, dividiendo este subconjunto en conjuntos de entrenamiento, validación y prueba en una proporción de 8:1:1. La selección de estas imágenes se realizó considerando entornos complejos, con múltiples productos dispuestos en una misma imagen y bajo diferentes condiciones de iluminación, reflejando con precisión los retos que los sistemas de autopago enfrentan en la práctica. Durante el entrenamiento, se estableció una tasa de aprendizaje inicial de 0.01, optimizada mediante el método de gradiente estocástico (SGD) con un tamaño de batch de 32. Los experimentos se llevaron a cabo en una GPU NVIDIA RTX 4080-16G, y se ejecutaron durante un total de 30 épocas para los experimentos comparativos, mientras que los estudios de ablación se realizaron en 25 épocas, lo que permitió evaluar de manera detallada el impacto individual de cada módulo añadido en el modelo. A través de estos estudios de ablación, se examinaron en profundidad los efectos de cada componente (EMA, C2f-Dual y la integración de los módulos de YOLOv8 y YOLOv10) en el desempeño global del sistema.
+
+
+
+
+%%%Ecuacion
+%\begin{equation}  
+%\label{eq:RMSE}
+%RMSE = \sqrt{\frac{\sum_{i=1}^{N}{\Big(O_i -T_i\Big)^2}}{N}}
+%\end{equation}
+
+
+\subsubsection{Resultados obtenidos}
+El sistema MidState-YOLO-ED demostró un rendimiento significativamente superior en comparación con otros modelos, alcanzando un valor de mAP del 89\% y una velocidad de procesamiento de 109 FPS, lo que confirma su idoneidad para aplicaciones en tiempo real. En comparación con otros detectores de objetos, como Faster R-CNN y SSD, MidState-YOLO-ED demostró una mayor precisión y velocidad, validando su capacidad para su implementación en entornos de autopago minorista, que suelen ser exigentes en cuanto a recursos computacionales. Además, en los experimentos de comparación, el sistema mostró una ventaja importante en cuanto a su arquitectura ligera, presentando solo 3,288,096 parámetros y 9.6 GFLOPs, lo que destaca su diseño eficiente en cuanto al uso de recursos. Esta arquitectura ligera permite que el sistema procese datos de imagen de manera rápida y precisa, haciéndolo adecuado para escenarios que requieren una rápida respuesta en tiempo real, además de facilitar su funcionamiento en dispositivos con recursos limitados, como dispositivos móviles y sistemas embebidos. Los resultados obtenidos muestran que el sistema supera a modelos tradicionales como Faster-RCNN, que, aunque precisos, suelen ser computacionalmente intensivos y no logran alcanzar la eficiencia requerida para su uso en aplicaciones de autopago en tiempo real.
+
+
+
+\subsection{Sistema de Detección y Conteo de Personas en Tiempo Real Usando Técnicas de Visión por Computadora y Aprendizaje Profundo}
+
+Este estudio presenta un sistema diseñado para la detección y el conteo de personas en tiempo real, específicamente orientado a la gestión de multitudes en espacios públicos como centros comerciales. La propuesta busca ofrecer una alternativa eficiente para el monitoreo y control de multitudes en el contexto de la pandemia de Covid-19, donde el distanciamiento social y la gestión de la densidad de personas son fundamentales para reducir la propagación del virus. El sistema combina técnicas avanzadas de visión por computadora con modelos de aprendizaje profundo, utilizando una interfaz gráfica de usuario (GUI) para simplificar la gestión y visualización de datos, facilitando una implementación directa en lugares de alto tráfico.
+
+
+
+\subsubsection{Planteamiento del Problema y objetivo }
+Con la pandemia, la necesidad de gestionar y limitar la densidad de personas en espacios cerrados ha cobrado una relevancia particular. En este contexto, los centros comerciales y otros espacios de alto tráfico representan un desafío significativo para el cumplimiento de normativas de seguridad, ya que el monitoreo manual resulta costoso y propenso a errores. Los sistemas de detección y conteo automatizados proporcionan una solución a esta necesidad, permitiendo un seguimiento en tiempo real sin intervención humana. Sin embargo, los métodos tradicionales de conteo de personas se ven afectados negativamente en condiciones complejas, como variaciones de iluminación, oclusión de objetos y diferentes orientaciones de cámara. Así, el objetivo de este trabajo es implementar un sistema de conteo de personas que sea preciso y eficiente, optimizando el modelo de YOLOv3 para la detección de objetos y utilizando el algoritmo de seguimiento DeepSORT para mantener la continuidad en el conteo de individuos en movimiento.
+
+\subsubsection{Técnicas empleadas por los autores}
+El sistema propuesto utiliza una combinación de técnicas de detección y seguimiento que permiten una detección precisa y rápida de personas. Las técnicas clave empleadas incluyen:
+
+Modelo YOLOv3 para Detección de Objetos: YOLOv3 es una red neuronal de convolución profunda que permite realizar la detección y clasificación en una sola etapa, lo cual reduce el tiempo de procesamiento. El modelo se entrenó usando el conjunto de datos COCO, estableciendo una configuración de ancho y alto de 416 píxeles para equilibrar precisión y velocidad. Con una precisión promedio (mAP) de 55.3 y una velocidad de 35 FPS, el modelo original cumple con los requisitos de procesamiento en tiempo real, aunque su rendimiento puede variar en función de los recursos computacionales disponibles.
+
+DeepSORT para Seguimiento de Objetos: La función de seguimiento es fundamental en un sistema de conteo para evitar el conteo duplicado de personas. DeepSORT permite el seguimiento en tiempo real utilizando un descriptor visual de características, lo cual ayuda a resolver problemas de oclusión y asegura la asignación precisa de identificadores únicos a cada individuo en el área de vigilancia. Esto permite realizar un seguimiento consistente incluso cuando las personas se cruzan o cuando un objeto se oculta temporalmente en el campo de visión.
+
+Conversión a Formato TensorFlow: Para optimizar el rendimiento en tiempo real, el modelo YOLOv3 fue convertido al formato TensorFlow, mejorando su eficiencia en unidades de procesamiento gráfico (GPU) en lugar de procesadores centrales (CPU). Esto es crucial para el procesamiento rápido y permite una mayor precisión y velocidad en la detección y el seguimiento en tiempo real.
+
+
+
+
+\subsubsection{Metodología empleada por los autores}
+El desarrollo del sistema se llevó a cabo con un enfoque en su aplicabilidad en entornos reales, como centros comerciales. Para simular este entorno, el sistema fue probado en múltiples videos de prueba, con duraciones entre 20 segundos y 2 minutos y distintas orientaciones de cámara, buscando reproducir la dinámica de un acceso de alto tráfico. La arquitectura del sistema incluye tres módulos principales: detección, seguimiento y visualización. La detección inicial se realiza mediante YOLOv3 para identificar objetos humanos y asignarles un identificador único; estos datos se procesan en el módulo de seguimiento con DeepSORT, permitiendo un seguimiento continuo sin pérdida de precisión.
+
+Para evaluar el rendimiento del sistema, se realizaron pruebas con dos versiones de YOLOv3: una versión completa y una variante más rápida, YOLOv3-tiny. La versión completa proporcionó una precisión promedio de 91.07\%, mientras que la versión rápida alcanzó un 76.8\%, con un rendimiento de 32 FPS. Ambas versiones fueron evaluadas en una GPU Nvidia GTX 1050 para maximizar la capacidad de procesamiento en tiempo real.
+
+
+
+%%%Ecuacion
+%\begin{equation}  
+%\label{eq:RMSE}
+%RMSE = \sqrt{\frac{\sum_{i=1}^{N}{\Big(O_i -T_i\Big)^2}}{N}}
+%\end{equation}
+
+
+\subsubsection{Resultados obtenidos}
+El sistema de detección y conteo de personas en tiempo real demostró un rendimiento superior en comparación con métodos tradicionales. La versión completa de YOLOv3 alcanzó una precisión de 91.07\% en condiciones de iluminación variadas y con diferentes ángulos de cámara, mientras que YOLOv3-tiny mostró ser más eficiente en escenarios de alta densidad de personas, logrando una velocidad de 32 FPS. Este modelo rápido demostró ser ideal para entornos en los que se requiere una mayor capacidad de respuesta, aunque con una ligera reducción en precisión. La elección de la versión a utilizar dependerá de las necesidades específicas del entorno y de los recursos de hardware disponibles.
+
+
+\subsection{Comprensión Profunda del Comportamiento de los Compradores en Entornos Minoristas Utilizando Visión RGB-D}
+
+Este artículo presenta una innovadora aplicación de aprendizaje profundo desarrollada para analizar el comportamiento de los compradores en entornos minoristas mediante el uso de cámaras RGB-D en configuración de vista superior. Esta investigación tiene como objetivo mejorar la precisión en la detección, el conteo y el análisis de interacciones entre compradores y estanterías. A través de un marco de aprendizaje profundo llamado VRAI (Visión, Robótica e Inteligencia Artificial), el sistema permite la identificación de patrones de movimiento y preferencias de los clientes, con aplicaciones clave en marketing y optimización del espacio de ventas.
+
+
+
+
+\subsubsection{Planteamiento del Problema y objetivo }
+La competencia en el sector minorista y la creciente necesidad de personalizar la experiencia de compra han impulsado la investigación en el análisis de patrones de compra. Sin embargo, obtener una comprensión precisa de los movimientos y comportamientos de los compradores plantea múltiples retos debido a factores como la oclusión y la variabilidad en las interacciones. Además, el volumen de datos generado en grandes espacios comerciales requiere soluciones robustas y eficientes. Este estudio pretende superar estos desafíos mediante una arquitectura de aprendizaje profundo aplicada a datos recopilados de cámaras RGB-D, que permite analizar de manera continua y precisa el comportamiento de los compradores y las interacciones con productos en estantes.
+
+
+\subsubsection{Técnicas empleadas por los autores}
+El sistema VRAI utiliza redes neuronales convolucionales (CNNs) avanzadas y el análisis de profundidad para ofrecer una alta precisión en la clasificación de interacciones, la reidentificación y el conteo de personas:
+
+Conteo de Personas (VRAI-Net 1): Esta red CNN de segmentación semántica realiza un análisis detallado de la presencia de personas en las imágenes captadas desde la vista superior. La red está optimizada para distinguir cabezas en escenas concurridas, logrando una precisión del 99.5\% en la clasificación.
+
+Clasificación de Interacciones (VRAI-Net 2): Esta red se centra en analizar los puntos de interacción de los clientes con los estantes. Para mejorar la precisión, emplea un módulo de inception que reduce la redundancia y optimiza el procesamiento en áreas clave de las imágenes, logrando una precisión del 92.6\%.
+
+Reidentificación (VRAI-Net 3): Utiliza un modelo de identificación de personas que permite rastrear a los compradores en diferentes áreas del comercio sin comprometer la privacidad. El sistema ha alcanzado una precisión del 74.5\% en la reidentificación, utilizando imágenes RGB-D y asignando identificadores únicos a cada comprador.
+
+
+
+
+\subsubsection{Metodología empleada por los autores}
+El sistema fue evaluado en varios entornos minoristas a lo largo de dos años, con datos recolectados de 24 cámaras RGB-D instaladas en configuración de vista superior en tiendas de varios países. La metodología incluyó pruebas en tres conjuntos de datos: TVHeads (conteo de personas), HaDa (interacciones comprador-estante) y TVPR2 (reidentificación), los cuales fueron etiquetados manualmente para validar el rendimiento del sistema.
+
+Entrenamiento: Se realizaron pruebas exhaustivas utilizando una combinación de imágenes de 8 y 16 bits para mejorar el contraste y precisión en la segmentación. Cada red fue entrenada y validada en estos conjuntos de datos y se optimizó con técnicas de aumento de datos como rotación y recorte.
+
+Evaluación de Precisión: Las redes VRAI se compararon con métodos convencionales como ResNet y U-Net, destacando en métricas de precisión, segmentación y eficiencia computacional.
+
+Configuración de Cámara y Captura de Datos: Las cámaras se colocaron en ubicaciones estratégicas de cada tienda para cubrir áreas clave como entradas y pasillos con productos populares, permitiendo un análisis detallado del comportamiento en función del tipo de estante.
+
+
+
+%%%Ecuacion
+%\begin{equation}  
+%\label{eq:RMSE}
+%RMSE = \sqrt{\frac{\sum_{i=1}^{N}{\Big(O_i -T_i\Big)^2}}{N}}
+%\end{equation}
+
+
+\subsubsection{Resultados obtenidos}
+El sistema VRAI superó a los métodos tradicionales en la precisión de detección y segmentación en todos los conjuntos de datos evaluados. En el conjunto TVHeads, VRAI-Net 1 logró una precisión del 99.5\% en conteo de personas, mientras que VRAI-Net 2 alcanzó el 92.6\% en la clasificación de interacciones en el conjunto HaDa. En cuanto a la reidentificación en el conjunto TVPR2, VRAI-Net 3 presentó una precisión del 74.5\%, ofreciendo una visión continua del movimiento de los compradores en toda la tienda.
+
+
+
+
+
+
+
+    
+
+
+
+
+
